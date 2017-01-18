@@ -1,0 +1,77 @@
+<project name="pdns-purge" default="build">
+  <target name="init">
+    <property name="name" value=""/>
+    <property name="version.major" value="1" />
+    <property name="version.minor" value="0" />
+    <property name="version" value="${version.major}.${version.minor}"/>
+
+    <tstamp>
+      <format property="build.time" pattern="yyyy-MM-dd HH:mm:ss"/>
+      <format property="year" pattern="yyyy" locale="en"/>
+      <format property="systime" pattern="yyyyMMddHHmmss" locale="ko"/>
+    </tstamp>
+
+    <echo message="----------- ${name} ${version} [${build.time}] ------------"/>
+    <echo message=""/>
+
+  	<property name="bin.dir" value="${basedir}/bin"/>
+  	<property name="src.dir" value="${basedir}/src"/>
+    <property name="lib.dir" value="${basedir}/lib"/>
+    <property name="jar.dir" value="${basedir}/jar"/>
+  	<property name="output.jar" value="pdns-purge.jar"/>
+
+  	<property name="debug" value="true"/>
+    <property name="debug.level" value="lines,source"/>
+
+    <path id="classpath" >
+    	<fileset dir="${lib.dir}" includes="*.jar"/>
+    </path>
+
+    <echo message="${bin.dir}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Clean up.                                                           -->
+  <!-- =================================================================== -->
+  <target name="clean" depends="init" description="clean up output files">
+    <delete dir="${bin.dir}"/>
+    <delete file="${jar.dir}/*"/>
+  </target>
+
+
+  <!-- =================================================================== -->
+  <!-- Prepares the build directory                                        -->
+  <!-- =================================================================== -->
+  <target name="prepare" depends="init">
+    <mkdir dir="${bin.dir}"/>
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- Compiles the source directory omitting files depending on jars present -->
+  <!-- ====================================================================== -->
+  <target name="compile" depends="clean,prepare">
+    <javac srcdir="${src.dir}" destdir="${bin.dir}" debug="${debug}" debuglevel="${debug.level}" encoding="utf-8">
+      <classpath refid="classpath"/>
+    </javac>
+  </target>
+
+	
+  <!-- ====================================================================== -->
+  <!-- make jar archive                                                       -->
+  <!-- ====================================================================== -->
+  <target name="jar" depends="compile">
+    <jar jarfile="${jar.dir}/${output.jar}" basedir="${bin.dir}" includes="*/**">
+	  <manifest>
+	    <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Sealed" value="false"/>
+	  </manifest>
+	</jar>
+  </target>
+	
+	
+  <!-- =================================================================== -->
+  <!-- Build                                                               -->
+  <!-- =================================================================== -->
+  <target name="build" depends="jar" description="compile dbadm lib"/>
+
+</project>
